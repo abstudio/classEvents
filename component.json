@@ -1,0 +1,18 @@
+{
+  "name": "classEvents",
+  "repo": "abstudio/classEvents",
+  "description": "Makes events support",
+  "version": "0.1.0",
+  "keywords": ["events","bind","trigger","on"],
+  "dependencies": {},
+  "scripts": [
+    "src/events.js"
+  ],
+  "license": "MIT",
+  "remotes": [
+    "github"
+  ],
+  "tags": [
+    "class"
+  ]
+}
