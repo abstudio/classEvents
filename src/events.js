@@ -3,6 +3,23 @@ define(function() {
 		this.eventListners = {};
 	}
 
+	var eventListner = function(own, event, i) {
+		this.owner = own;
+		this.event = event;
+		this.index = i;
+	}
+	eventListner.prototype = {
+		constructor: eventListner,
+		destroy: function() {
+			this.owner.eventListners[this.event][this.index] = null;
+			this.owner = null;
+			this.event = null;
+			this.index = null;
+		}
+	}
+
+
+
 	Events.prototype = {
 		constructor: Events,
 		bind : function(e, callback, once) {
@@ -15,9 +32,15 @@ define(function() {
 
 			return this;
 		},
-		on: function() {
-			this.bind.apply(this, arguments);
-			return this;
+		on: function(e, callback, once) {
+			if (typeof this.eventListners[e] != 'object') this.eventListners[e] = [];
+			
+			this.eventListners[e].push({
+				callback: callback,
+				once: once||false
+			});
+
+			return new eventListner(this, e, this.eventListners[e].length-1);
 		},	
 		once : function(e, callback) {
 			this.bind(e, callback, true);
@@ -39,7 +62,7 @@ define(function() {
 			if (typeof this.eventListners[e] == 'object' && this.eventListners[e].length>0) {
 				var todelete = [];
 				for (var i = 0; i<this.eventListners[e].length; i++) {
-					if (typeof this.eventListners[e][i] === 'object') {
+					if (this.eventListners[e][i]!==null) {
 						if (typeof this.eventListners[e][i].callback === "function") response = this.eventListners[e][i].callback.apply(this, args);
 						
 						if (this.eventListners[e][i].once) {
@@ -50,7 +73,7 @@ define(function() {
 				};
 				
 				if (todelete.length>0) for (var i in todelete) {
-					this.eventListners[e].splice(todelete[i], 1);
+					this.eventListners[e][todelete[i]] = null;
 				};
 			};
 			return response;
